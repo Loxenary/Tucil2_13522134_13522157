@@ -2,6 +2,7 @@ import customtkinter as tk
 from tkinter import messagebox
 import os
 from PIL import Image
+import time
 
 class App(tk.CTk):
     def __init__(self):
@@ -13,19 +14,25 @@ class App(tk.CTk):
         self.InputFrame = InputFrame(self)
         self.OutputFrame = OutputFrame(self)
 
+
 class InputFrame(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent,corner_radius=0)
         self.pack()
+        self.parent = parent
         self.pack_configure(side="left",fill="both")
         self.setupScrollableContainer()
         self.container = InputContainer(self.scrollable_frame)
+        self.canvas.bind_all("<MouseWheel>",self.on_mousewheel)
+
+    def on_mousewheel(self,event):
+        text = str(event.widget)
+        if "inputframe" in text:
+            self.canvas.yview_scroll(-1 * int((event.delta / 120)), "units")
+        
     def setupScrollableContainer(self):
         def on_canvas_configure(event):
             self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-        def on_mousewheel(event):
-            self.canvas.yview_scroll(-1 * int((event.delta / 120)), "units")
 
         self.canvas = tk.CTkCanvas(self,bg="#384764")
         self.scrollable_frame = tk.CTkFrame(self.canvas,fg_color='#384764')
@@ -40,7 +47,6 @@ class InputFrame(tk.CTkFrame):
         self.canvas.pack()
         self.canvas.pack_configure(side="left",fill="both",expand=True)
 
-        self.canvas.bind_all("<MouseWheel>",on_mousewheel)
 class InputContainer(tk.CTkFrame):
     def __init__(self,parent):
         super().__init__(master=parent, corner_radius=0, border_width=0, border_color="#D9D9D9", fg_color="#384764")
@@ -55,6 +61,7 @@ class InputContainer(tk.CTkFrame):
         self.setupPointsField()
         self.setupButton()
 
+    # Setup the Iteration input field component
     def setupIterationField(self):
         def validate_iteration(action, value_if_allowed):
             if not value_if_allowed: 
@@ -94,28 +101,32 @@ class InputContainer(tk.CTkFrame):
         self.entry_iteration.configure(justify="center")
         self.entry_iteration.pack()
         self.entry_iteration.pack_configure(padx=(50,50), pady=(0,40),anchor="center")
+    # Setup the Point input field components
     def setupPointsField(self):
         self.inputField = InputFieldDots(self)
+    
+    # Setup the main functioning button
     def setupButton(self):
         self.data_x = self.inputField.entry_x
         self.data_y = self.inputField.entry_y
-        def isIterationEmpty():
+        # Check is the Data for iteration is Empty or not
+        def isIterationValid():
             current_text = self.entry_iteration.get()
-            return current_text == "" or current_text == self.entryplaceholder
+            return (current_text == "" or current_text == self.entryplaceholder or (not current_text.isdigit()))
         def isBlankOnData():
 
             length_entry = len(self.data_x)
             for i in range(length_entry):
-                if(self.data_x[i].get() == "X" or self.data_y[i].get() == "Y"):
+                if(self.data_x[i].get() == "X" or self.data_y[i].get() == "Y" or (not self.data_x[i].get().isdigit())):
                     return True
             return False
         def DataSave():
             self.data_path = os.path.join(os.path.dirname(__file__),"data.txt")
-            if(isIterationEmpty()):
-                messagebox.showwarning("Iteration Blank","Please fill the Input Iteration Field")
+            if(isIterationValid()):
+                messagebox.showwarning("Iteration InValid","Please fill the Iteration Field or Re-input the valid data for the iteration")
                 return
             if(isBlankOnData()):
-                messagebox.showwarning("Field Blank","Please Fill all the Input Dots")
+                messagebox.showwarning("Field Data Invalid","Please Fill all the Input Dots or Re-input the valid data for the data field")
                 return               
             data_iteration = self.entry_iteration.get()
             if(self.data_path):
@@ -166,7 +177,7 @@ class InputFieldDots:
         self.ButtonPreparation()
         self.SetupDataInput()
         self.SetupListDataField()
-
+    # Prepate Button Images
     def ButtonPreparation(self):
         button_image_path = os.path.join(os.path.dirname(__file__), "Assets","triangle.png")
         button_image = Image.open(button_image_path)
@@ -178,6 +189,7 @@ class InputFieldDots:
 
         self.right_button_image = tk.CTkImage(self.right_button_image,size=(self.buttonPhoto_x,self.buttonPhoto_y))
 
+    # Point Validation for Data Field
     def validate_num_points(self,action,value_if_allowed):
             if not value_if_allowed:  # Allow if the entry is empty
                 return True
@@ -186,11 +198,12 @@ class InputFieldDots:
             if action == '1':  # Insert action
                 if value_if_allowed.isdigit():
                     return True   
-                elif value_if_allowed.startswith('-') and value_if_allowed[1:].isdigit():
+                elif value_if_allowed == '-' or value_if_allowed[1:].isdigit():
                     return True
                 return False
             return True
 
+    # Update all the data fields grid
     def update_entry_fields(self):
         num_of_dots = self.InputLabel.cget("text")
         try:
@@ -225,6 +238,7 @@ class InputFieldDots:
         except ValueError:
             pass
 
+    # Setup the data input components 
     def SetupDataInput(self):
         def LeftButtonClick():
             current_value = int(self.InputLabel.cget("text"))
@@ -270,6 +284,8 @@ class InputFieldDots:
 
         self.rightButton.grid()
         self.rightButton.grid_configure(column=2,row=0)
+   
+    # Setup the data field list 
     def SetupListDataField(self):
         self.frame_point = tk.CTkFrame(self.parent, fg_color="#384764")
 
@@ -281,13 +297,30 @@ class InputFieldDots:
 class OutputFrame(tk.CTkFrame):
     def __init__(self,parent):
         super().__init__(master=parent, width=1, fg_color="#191E23")
-        self.pack()
-        self.pack_configure(side="right",fill="both",expand=True)
+        self.pack()        
+        self.pack_configure(side="right",
+        fill="both",expand=True, anchor="n")
+
+        self.fontTime = tk.CTkFont(family="Courier New",size=20, weight="bold")
+        self.fontTitle = tk.CTkFont(family="Courier New", weight="bold", underline=True, size=48, slant="italic")
         self.setupOutputTitle()
+        self.setupOutputCanvas()
+        self.setupTime()
 
     def setupOutputTitle(self):
-        self.OutputTitle = tk.CTkLabel(self,text="BEZIER CURVE SIMULATION", text_color="white",font=("Helvaica",48))
+        self.OutputTitle = tk.CTkLabel(self,text="BEZIER CURVE SIMULATION", text_color="white",font = self.fontTitle)
         self.OutputTitle.pack()
+        self.OutputTitle.pack_configure(anchor='n', padx=15)
+
+    def setupOutputCanvas(self):
+        self.canvas = tk.CTkCanvas(self, height=800)
+        self.canvas.pack()
+        self.canvas.pack_configure(padx=10, pady=20, fill="both",expand=True, side="top")
+    
+    def setupTime(self):
+        self.timeLabel = tk.CTkLabel(self,text="Time Execution: ",font=self.fontTime, text_color="white")
+        self.timeLabel.pack()
+        self.timeLabel.pack_configure(pady=(10,20),anchor='w', padx=15)
 
 
 def main():
