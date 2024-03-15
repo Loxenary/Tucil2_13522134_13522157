@@ -2,6 +2,7 @@ import customtkinter as tk
 from tkinter import messagebox
 import os
 from PIL import Image
+import numpy as np
 
 class App(tk.CTk):
     def __init__(self):
@@ -125,16 +126,7 @@ class InputContainer(tk.CTkFrame):
                 messagebox.showwarning("Field Data Invalid","Please Fill all the Input Dots or Re-input the valid data for the data field")
                 return               
             data_iteration = self.entry_iteration.get()
-            if(self.data_path):
-                with open(self.data_path, "w") as f:
-                    f.write(f'{data_iteration}\n')
-                with open(self.data_path, "a") as f:
-                    for x_entry, y_entry in zip(self.data_x,self.data_y):
-                        x_value = x_entry.get()
-                        y_value = y_entry.get()
-                        if x_value and y_value:
-                            f.write(f'{x_value} {y_value}\n')
-                messagebox.showinfo("Data Saved","Data Saved Successfully")
+            
         def BruteForceCallout():
             DataSave()
             #TODO: Implement Bruteforce funcion on Bezier Curve
@@ -316,16 +308,6 @@ class OutputFrame(tk.CTkFrame):
         self.timeLabel.pack()
         self.timeLabel.pack_configure(pady=(10,20),anchor='w', padx=15)
 
-class BezierCurveDrawing(tk.CTkCanvas):
-    def __init__(self):
-        super().__init__()
-        self.setupCanvas()
-    def setupCanvas(self):
-        self.canvas = tk.CTkCanvas(self,height = 800)
-        self.canvas.pack()
-        self.canvas.pack_configure(padx=10, pady=20, fill="both",expand=True, side="top")
-
-        
 
 def main():
     app = App()
@@ -333,80 +315,9 @@ def main():
 
 
 
+
+
 '''
-import tkinter as tk
-import numpy as np
-import time
-
-class BezierAnimation(tk.Canvas):
-    def __init__(self, master=None, **kwargs):
-        super().__init__(master, **kwargs)
-        self.configure(width=800, height=600, bg="white")
-        self.pack(fill=tk.BOTH, expand=True)
-        self.point_curve = [(200, 300.11), (150, 100), (650, 100), (700, 500)]
-        self.step = 0
-        self.steps = 20
-        self.draw_points()
-        self.lines_container = self.point_curve.copy()
-        self.prev_lines = []
-        
-    def draw_points(self):
-        points_container = None
-        for i in range(len(self.point_curve)):
-            x0, y0 = self.point_curve[i]
-            self.create_oval(x0, y0, x0 + 10, y0 + 10, fill="blue")
-            if(points_container):
-                self.create_line(points_container[0] + 5,points_container[1] + 5,x0 + 5,y0 + 5,fill='blue')
-            points_container = (x0,y0)
-
-    def interpolate_line(self,p1,p2,t):
-        x1= p1[0]
-        x2 = p2[0]
-        y1 = p1[1]
-        y2 = p2[1]
-        x = x1 + (x2 - x1) * t
-        y = y1 + (y2 - y1) * t
-        return x, y        
-
-    def bezier_curve(self, points):
-
-        for line_id in self.prev_lines:
-                self.delete(line_id)
-        self.prev_lines.clear()
-                
-        points = list(points)
-        t = self.step / self.steps
-        prev_x, prev_y = points[0]
-        x = (1 - t) ** 3 * points[0][0] + 3 * t * (1 - t) ** 2 * points[1][0] + 3 * t ** 2 * (1 - t) * points[2][0] + t ** 3 * points[3][0]
-        y = (1 - t) ** 3 * points[0][1] + 3 * t * (1 - t) ** 2 * points[1][1] + 3 * t ** 2 * (1 - t) * points[2][1] + t ** 3 * points[3][1]
-
-        temp_of_dots = []
-        if self.step > 0:
-            temp_points = self.lines_container.copy()
-            container = []
-            while(len(temp_points) != 2): 
-                temp_of_dots.clear()               
-                for i in range(len(temp_points)-1):
-                    interpolated_points = self.interpolate_line(temp_points[i],temp_points[i+1],t)
-                    temp_of_dots.append(interpolated_points)
-
-                print("Interpolate: ", temp_of_dots)
-                temp_points = temp_of_dots.copy()
-                for i in range(len(temp_of_dots)-1):
-                    line_id= self.create_line(temp_of_dots[i][0] + 5,temp_of_dots[i][1] + 5,temp_of_dots[i+1][0] + 5,temp_of_dots[i+1][1]+ 5)   
-                    self.prev_lines.append(line_id)        
-            print("c1: ",temp_of_dots)
-            # container.append(temp_points.copy())
-            # print("c2: ",container)
-
-            prev_x, prev_y = self.point_curve[-1]
-            self.create_line(prev_x, prev_y, x, y, fill="red")
-        self.point_curve.append((x, y))
-        self.step += 1
-        if self.step <= self.steps:
-            time.sleep(0.25)
-            self.after(1
-            , lambda: self.bezier_curve(self.point_curve))
 
 def main():
     root = tk.Tk()
