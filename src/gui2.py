@@ -2,7 +2,6 @@ import customtkinter as tk
 from tkinter import messagebox
 import os
 from PIL import Image
-import time
 
 class App(tk.CTk):
     def __init__(self):
@@ -13,8 +12,6 @@ class App(tk.CTk):
     def setupFrame(self):
         self.InputFrame = InputFrame(self)
         self.OutputFrame = OutputFrame(self)
-
-
 class InputFrame(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent,corner_radius=0)
@@ -46,7 +43,6 @@ class InputFrame(tk.CTkFrame):
         self.scroll_bar.pack_configure(side="right",fill='y')
         self.canvas.pack()
         self.canvas.pack_configure(side="left",fill="both",expand=True)
-
 class InputContainer(tk.CTkFrame):
     def __init__(self,parent):
         super().__init__(master=parent, corner_radius=0, border_width=0, border_color="#D9D9D9", fg_color="#384764")
@@ -156,7 +152,6 @@ class InputContainer(tk.CTkFrame):
 
         self.decrease_conquer_button.pack()
         self.decrease_conquer_button.pack_configure(pady=20)
-
 class InputFieldDots:
     def __init__(self,parent):
         self.parent = parent
@@ -293,7 +288,6 @@ class InputFieldDots:
         self.frame_point.pack_configure(pady=(20,50), anchor="center")
 
         self.update_entry_fields()
-
 class OutputFrame(tk.CTkFrame):
     def __init__(self,parent):
         super().__init__(master=parent, width=1, fg_color="#191E23")
@@ -322,6 +316,17 @@ class OutputFrame(tk.CTkFrame):
         self.timeLabel.pack()
         self.timeLabel.pack_configure(pady=(10,20),anchor='w', padx=15)
 
+class BezierCurveDrawing(tk.CTkCanvas):
+    def __init__(self):
+        super().__init__()
+        self.setupCanvas()
+    def setupCanvas(self):
+        self.canvas = tk.CTkCanvas(self,height = 800)
+        self.canvas.pack()
+        self.canvas.pack_configure(padx=10, pady=20, fill="both",expand=True, side="top")
+
+    def drawBezierCurve(self):
+        
 
 def main():
     app = App()
