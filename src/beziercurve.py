@@ -26,32 +26,54 @@ class BezierCurve:
             return []
         
 
-    def make_bezier(self, *control_points, iterations):
-        self.curve_points.clear()
-        self.control_points = list(control_points)
+    def make_bezier_three_point(self, *control_points, iterations):
+        curve_points = []
 
         iterations1 = self.midpoint_of_three(*control_points)
-        self.curve_points.append(iterations1)
-        print(self.curve_points)
+        curve_points.append(iterations1)
 
         # Memulai rekursi untuk menghitung titik-titik kurva Bezier di iterasi yang lebih dari 1
-        if iterations>1 :
+        if iterations > 1:
             another_points_curve = self.calculate_bezier_three_point(control_points, iterations) 
-            self.curve_points.extend(another_points_curve.copy())
-        print(self.curve_points)
+            curve_points.extend(another_points_curve)
 
-        
         # Hubungkan titik kontrol pertama dengan titik kurva pertama
-        if len(self.curve_points) > 0:
-            self.curve_points.insert(0, self.control_points[0])
-        print(self.curve_points)
-        
+        if len(curve_points) > 0:
+            curve_points.insert(0, control_points[0])
+            
         # Hubungkan titik kontrol terakhir dengan titik kurva terakhir
-        if len(self.curve_points) > 0:
-            self.curve_points.append(self.control_points[-1])
-        print(self.curve_points)
-        self.curve_points=sorted(self.curve_points, key=lambda p: p[0])
-        print(self.curve_points)
+        if len(curve_points) > 0:
+            curve_points.append(control_points[-1])
+
+        # Urutkan titik-titik kurva berdasarkan nilai x
+        curve_points = sorted(curve_points, key=lambda p: p[0])
+
+        return curve_points
+
+    def make_bezier(self, *control_points, iterations):
+        #print(len(control_points))
+        self.control_points = list(control_points)
+        # Jumlah titik kontrol harus minimal 3
+        if len(control_points) < 3:
+            print("Error: Minimum 3 control points required.")
+            return
+
+        # Jika jumlah titik kontrol sama dengan 3, gunakan make_bezier_three_point
+        elif len(control_points) == 3:
+            self.curve_points = self.make_bezier_three_point(*control_points, iterations=iterations)
+            return
+
+        else:
+            # Bagi control points menjadi segmen-segmen berukuran 3
+            segments = [control_points[i:i+3] for i in range(0, len(control_points)-2, 1)]
+            
+            # Untuk setiap segmen, terapkan make_bezier_three_point dan tambahkan ke self.curve_points
+            for segment in segments:
+                segment_curve_points = self.make_bezier_three_point(*segment, iterations=iterations)
+                #print (segment_curve_points)
+                self.curve_points.extend(segment_curve_points)
+
+        #print(self.curve_points)
 
 
     def midpoint(self, p1, p2):
