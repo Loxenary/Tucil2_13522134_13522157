@@ -5,15 +5,12 @@ if __name__ == "__main__":
     # gui2.main()
     root = tk.CTk()
     
-    
-    control_points = [(100,200),(200,300),(500,100),(500,400),(200,500)]  
+    control_points = [(100,200),(200,300),(500,100)]  
     iterations = 3
     Bezier_dnc.DncAnimation(root,control_points,iterations)
     root.mainloop()
 
-
 '''
-
         for line_id in self.prev_lines:
                 self.delete(line_id)
         self.prev_lines.clear()

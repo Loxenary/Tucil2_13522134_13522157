@@ -6,7 +6,7 @@ class DncAnimation(tk.CTkCanvas):
         super().__init__(master,width=800, height=600,bg="white")
         self.pack()
         self.pack_configure(fill=tk.BOTH,expand=True)
-
+        self.start_time = time.time()
         self.update_idletasks()
         # Bezier Curves Data
         self.control_points = control_points
@@ -19,6 +19,7 @@ class DncAnimation(tk.CTkCanvas):
         self.draw_points()
         self.lines_container = self.control_points.copy()
         self.prev_lines = []
+        self.interpolated_lines = []
         self.bezier_curve()
     
     def calculate_bezier_three_point(self, control_points, iterations):
@@ -114,28 +115,56 @@ class DncAnimation(tk.CTkCanvas):
         y = y1 + (y2 - y1) * t
         return x, y        
 
+    def animation(self,bezier_points,counter = 0):
+        
+        for line_id in self.interpolated_lines:
+            self.delete(line_id)
+        self.interpolated_lines.clear()
+        
+        t = counter / self.length_bezier
+        x1, y1 = bezier_points[0]
+        x2, y2 = bezier_points[1]
+        line_id = self.create_line(x1, y1, x2, y2,fill='red')
+        self.create_oval(x2 - 5, y2 - 5, x2 + 5, y2 + 5, fill='red')
+        self.prev_lines.append(line_id)
+        bezier_points.pop(0)
+
+
+        temp_points = self.lines_container.copy()
+        temp_of_dots = []
+        while(len(temp_points) !=2):
+            temp_of_dots.clear()
+            for i in range(len(temp_points) - 1):
+                interpolate_points = self.interpolate_line(temp_points[i], temp_points[i + 1],t)
+                temp_of_dots.append(interpolate_points)
+            print("Interpolate: ",temp_of_dots)
+            temp_points = temp_of_dots.copy()
+            for i in range(len(temp_of_dots)-1):
+                line_id = self.create_line(temp_of_dots[i][0],temp_of_dots[i][1],temp_of_dots[i + 1][0], temp_of_dots[i+1][1])
+                self.interpolated_lines.append(line_id)
+        last_interpolated_point = temp_of_dots[-1]
+        x_last, y_last = last_interpolated_point
+        x_second_control, y_second_control = bezier_points[-1]
+        line_id = self.create_line(x_last, y_last, x_second_control, y_second_control)
+        self.interpolated_lines.append(line_id)
+        if(len(bezier_points) > 1):
+            print("t: ",t)
+            iterator = len(bezier_points) / self.length_bezier
+            self.after(300,lambda: self.animation(bezier_points,counter + 1))
+        
     def bezier_curve(self):
-
-        def animation(bezier_points):
-            x1, y1 = bezier_points[0]
-            x2, y2 = bezier_points[1]
-            line_id = self.create_line(x1, y1, x2, y2,fill='red')
-            self.create_oval(x2 - 5, y2 - 5, x2 + 5, y2 + 5, fill='red')
-            self.prev_lines.append(line_id)
-            bezier_points.pop(0)
-            if(len(bezier_points) > 1):
-                self.after(250, animation(bezier_points))
-
+        for line_id in self.prev_lines:
+            self.delete(line_id)
+        self.prev_lines.clear()
         if(len(self.control_points) == 3):
-            for line_id in self.prev_lines:
-                self.delete(line_id)
-            self.prev_lines.clear()
         
             bezier_points = self.make_bezier_three_point(*self.control_points,iterations=self.iteration)
-            print(bezier_points)
+            end_time = time.time()
 
-            animation(bezier_points)
-        elif()
+            print("Time: ",end_time - self.start_time)
+            self.length_bezier = len(bezier_points) - 2
+        
+            self.animation(bezier_points)
 
 
             # if self.step <= self.steps:
