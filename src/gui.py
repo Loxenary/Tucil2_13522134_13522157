@@ -172,36 +172,23 @@ class InputContainer(tk.CTkFrame):
         
         def DataSave(algorithm):
             db.clear_all_data()
-            self.data_path = os.path.join(os.path.dirname(__file__),"data.txt")
+            # self.data_path = os.path.join(os.path.dirname(__file__),"data.txt")
             if(isIterationValid()):
                 messagebox.showwarning("Iteration InValid","Please fill the Iteration Field or Re-input the valid data for the iteration")
                 return
-            # if(isBlankOnData()):
-            #     messagebox.showwarning("Field Data Invalid","Please Fill all the Input Dots or Re-input the valid data for the data field")
-            #     return
+            if(isBlankOnData()):
+                messagebox.showwarning("Field Data Invalid","Please Fill all the Input Dots or Re-input the valid data for the data field")
+                return
+            
+            data_length = int(self.inputField.InputLabel.cget("text"))
+            for i in range(data_length):               
+                db.set_control_points_from_idx((self.data_x[i].get(),self.data_y[i].get()))
+            db.set_selected_points(data_length)
 
-            if(self.data_path):
-                count = 0
-                with open(self.data_path, "r") as f:
-                    for i in range(len(self.data_x)):
-                        data = f.readline().strip().split(',')
-                        count += 1
-                        db.set_control_points_from_idx((data[0],data[1]))
-                    f.close()
-                db.set_selected_points(count)
-                db.set_iterations(self.entry_iteration.get())
-                db.data_algorithm = algorithm
-                self.callbackFunction()
-
-            else:
-                data_length = int(self.inputField.InputLabel.cget("text"))
-                for i in range(data_length):               
-                    db.set_control_points_from_idx((self.data_x[i].get(),self.data_y[i].get()))
-                db.set_selected_points(data_length)
-
-                db.set_iterations(self.entry_iteration.get())
-                db.data_algorithm = algorithm
-                self.callbackFunction()
+            db.set_iterations(self.entry_iteration.get())
+            db.data_algorithm = algorithm
+            db.animation_speed = int(self.entry_speed.get())
+            self.callbackFunction()
             
 
         def BruteForceCallout():
@@ -441,7 +428,6 @@ class OutputFrame(tk.CTkFrame):
                 # Y coordinates
                 for i in range(bin_y, -1,-1):
                     y1 = (self.canvas.winfo_height() -  (iterate_y * i+ y2))
-                    print("i: ",i)
                     if(not db.is_Button_clicked):
                         test = "" 
                         text_padding = 6

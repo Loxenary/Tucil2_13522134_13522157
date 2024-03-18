@@ -27,6 +27,7 @@ def main():
     # Menghasilkan kurva Bezier
     bezier.make_bezier(*control_points, iterations=iterations)
     end_time = time.time()
+    print("Curve Points : ",bezier.curve_points)
     
     # Menghitung dan mencetak waktu yang dibutuhkan untuk pembuatan kurva
     print("Time execution:", end_time - start_time, "seconds")

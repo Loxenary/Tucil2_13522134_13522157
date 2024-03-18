@@ -9,7 +9,7 @@ class Database:
 
     apps_height: float = None
     apps_width: float = None
-    animation_speed: float = None
+    animation_speed: float = 40
 
     is_Button_clicked: bool = False
 
@@ -44,7 +44,6 @@ class Database:
 
         if(additional_x > Database.apps_width or additional_y > Database.apps_height):
             Database.control_points.clear()
-            print("test:", additional_x,"y: ", additional_y)
         
         # Handle any negative x values
         if(additional_x > Database.apps_width and additional_y > Database.apps_height):
@@ -76,29 +75,20 @@ class Database:
         offset_y_bottom = 150
         offset_x_rigth = Database.apps_width - (offset_x_left * 2)
         offset_y_top = Database.apps_height - (offset_y_bottom * 2)
-        print("Ofset: ",offset_x_rigth)
-        
-        for i in temp_normalize_y:
-            print("Data: ", (Database.apps_height - ((i* offset_y_top) +offset_y_bottom)))
-
-
+    
         temp_scaled_up = [((x * offset_x_rigth) + offset_x_left , (Database.apps_height - ((y * offset_y_top) +offset_y_bottom))) for x, y in zip(temp_normalize_x, temp_normalize_y)]
 
-        Database.print_control_points()
         Database.control_points = temp_scaled_up
         Database.set_minmax()
         Database.handle_negatives_data()
 
     def handle_points_flipped(canvas_height):
         temp = [(x,canvas_height - y) for x,y in Database.control_points]
-        print("height: ",canvas_height)
+        
         Database.control_points = temp
 
     @staticmethod
-    def handle_control_points(canvas_height, canvas_width):
-        print("Previously: ")
-        Database.print_control_points()
-        
+    def handle_control_points(canvas_height, canvas_width):    
         Database.handle_negatives_data()
         Database.set_apps_height(canvas_height)
         Database.set_minmax()
@@ -107,8 +97,6 @@ class Database:
         Database.set_apps_width(canvas_width)
         
         Database.set_minmax()
-        print("================================================================")
-        print("Handle scaling: ")
         Database.handle_points_scaling()
         return Database.control_points
 
