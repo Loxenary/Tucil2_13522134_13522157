@@ -409,18 +409,89 @@ class OutputFrame(tk.CTkFrame):
         self.canvas.scan_dragto(event.x, event.y, gain=1)
 
     def setupOutputCanvas(self):
-        def display_coordinates(event):
-            print("Click Coordinates : ")
-            print("X : ",event.x)
-            print("Y : ",event.y)
+        def setup_grid_coordinate():
+            def get_normalized_numeration(bin_x, bin_y):
+                ranges_x = db.max_x - db.min_x
+                ranges_y = db.max_y - db.min_y
 
-            print("Width and Height : ",self.canvas.winfo_width(),self.canvas.winfo_height())
+                iteration_x = ranges_x / bin_x
+                iteration_y = ranges_y / bin_y
+                
+                return iteration_x, iteration_y
+            def setup_border():
+                x1= 100
+                y1= 100
+                x2 = self.canvas.winfo_width() - 100
+                y2 = self.canvas.winfo_height() - 100
+                self.canvas.create_rectangle(x1,y1,x2,y2, outline="black", width=2)
+                self.rectangle_height = y2-y1
+                self.rectangle_width = x2-x1
+
+            def setup_coordinate_text(bin_x, bin_y):
+                iterate_x = (self.canvas.winfo_width() - 300) / bin_x
+                iterate_y = (self.canvas.winfo_height() - 300) / bin_y
+
+                iterate_val_x, iterate_val_y = get_normalized_numeration(bin_x,bin_y)
+                x1 = 100
+                y1 = 150 
+                x2 = x1 - 8
+                y2 = y1
+                
+
+                # Y coordinates
+                for i in range(bin_y, -1,-1):
+                    y1 = (self.canvas.winfo_height() -  (iterate_y * i+ y2))
+                    print("i: ",i)
+                    if(not db.is_Button_clicked):
+                        test = "" 
+                        text_padding = 6
+                    else:
+                        if(i == bin_y):
+                            test = "{:.2f}".format(db.max_y)
+
+                        elif(i == 0):
+                            test = "{:.2f}".format(db.min_y)
+    
+                        else:
+                            test = "{:.2f}".format(db.min_y + (iterate_val_y * i))
+                            
+                        text_padding = 6 * len(test)
+                    font_text= tk.CTkFont("Courier New",30 - (len(str(test) * 2) ),weight="bold")
+                    self.canvas.create_line(x1, y1, x2, y1, width=2)
+                    self.canvas.create_text(x2 - text_padding, y1, text=test,font= font_text)
+                # X coordinates
+                y1 = self.canvas.winfo_height() - 100
+                x1 = 0
+                x2 = 150
+                y2 = y1 + 8
+                for j in range(0, bin_x+1):
+                    text_padding = 25
+                    x1 = (iterate_x * j) + x2
+                    test= 10 * (bin_x - j)
+                
+                    if(not db.is_Button_clicked):
+                        test = ""
+                    else:
+                        if(j == 0):
+                            test = "{:.2f}".format(db.min_x)
+                        elif(j == bin_x):
+                            test= "{:.2f}".format(db.max_x)
+                        else:
+                            test = "{:.2f}".format(db.min_x + (iterate_val_x * j))
+                    font_text= tk.CTkFont("Courier New",22 - len(str(test)),weight="bold")
+                    self.canvas.create_line(x1,y1, x1,y2, width=2)
+                    self.canvas.create_text(x1, y1+ text_padding, text=test,font= font_text)
+            # Setup Border Around the output
+            setup_border()
+            if(db.is_Button_clicked):
+                setup_coordinate_text(5,8)
+
 
         scrollbar = tk.CTkScrollbar(self, orientation=tk.VERTICAL)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
         def call_bezier():
-        
+            setup_grid_coordinate()
             # height are applied inside the change_control_points function
             self.canvas.change_control_points(self.canvas.winfo_height(),self.canvas.winfo_width())
             self.canvas.setup_bezier_animation()
@@ -447,8 +518,7 @@ class OutputFrame(tk.CTkFrame):
             # Setup for handling negative number 
             db.set_apps_height(canvas_height - 100)
             db.set_apps_width(canvas_width - 100)
-            db.max_x = max_x
-            db.max_y = max_y
+            db.set_minmax()
 
 
             if self.canvas:
@@ -467,7 +537,8 @@ class OutputFrame(tk.CTkFrame):
             self.canvas = tk.CTkCanvas(self,height=1100,width = 2000)
             self.canvas.pack()
             self.canvas.pack_configure(padx=10, pady=20, side="top")
-        self.canvas.bind("<ButtonPress-1>",display_coordinates)
+            self.after(100,setup_grid_coordinate)
+        
         self.canvas.config(yscrollcommand=scrollbar.set)
         scrollbar.configure(command=self.canvas.yview)
     def setupTime(self):

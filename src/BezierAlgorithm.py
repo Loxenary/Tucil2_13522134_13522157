@@ -141,8 +141,8 @@ class DNC_Algorthm(BezierCanvasAnimation):
         # Menghitung midpoint dari tiga titik
         return self.midpoint(self.midpoint(a, b), self.midpoint(b, c))
 
-    def change_control_points(self, canvas_width, canvas_height):
-        self.control_points = db.handle_control_points(canvas_height,canvas_width)
+    def change_control_points(self, canvas_height, canvas_width):
+        self.control_points = db.handle_control_points(canvas_height, canvas_width)
 
     def bezier_curve(self):
         for line_id in self.prev_lines:

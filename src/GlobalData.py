@@ -71,17 +71,9 @@ class Database:
 
         temp_normalize_x = [(x - min_x) / (max_x - min_x)  for x, _ in Database.control_points]
 
-        
-        print("Temp y: ",temp_normalize_y)
-    
-        print("Temp x: ",temp_normalize_x)
-
         # set padding for max values
-        print("Height:",Database.apps_height)
-        print("Width:",Database.apps_width)
-        
-        offset_x_left = 200
-        offset_y_bottom = 200
+        offset_x_left = 150
+        offset_y_bottom = 150
         offset_x_rigth = Database.apps_width - (offset_x_left * 2)
         offset_y_top = Database.apps_height - (offset_y_bottom * 2)
         print("Ofset: ",offset_x_rigth)
@@ -96,26 +88,6 @@ class Database:
         Database.control_points = temp_scaled_up
         Database.set_minmax()
         Database.handle_negatives_data()
-
-        # scale_factor = 0.5
-        # width = Database.apps_width
-        # height = Database.apps_height
-
-        # x_range = abs(Database.max_x - Database.min_x)
-        # y_range = abs(Database.max_y - Database.min_y)
-
-        # print("width: " + str(width) + " height: " + str(height))
-        # x_scale = width / x_range
-        # y_scale = height / y_range
-        
-        # scale = min(x_scale,y_scale) * scale_factor
-
-        # x_add = 0; y_add = 0
-        # if(x_scale <= y_scale):
-        #     x_add = 100
-        # else:
-        #     y_add = 100
-        # Database.control_points = [((scale * (x - Database.min_x) )+ x_add, (scale * (y - Database.min_y)) + y_add) for x,y in Database.control_points]
 
     def handle_points_flipped(canvas_height):
         temp = [(x,canvas_height - y) for x,y in Database.control_points]
