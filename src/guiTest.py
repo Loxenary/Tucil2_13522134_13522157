@@ -8,7 +8,7 @@ import BezierAlgorithm as bz
 class App(tk.CTk):
     def __init__(self):
         super().__init__()
-        self.geometry("1243x714")
+        self.geometry("1500x850")
         self.setupFrame()
         db.clear_all_data()
 
@@ -176,18 +176,32 @@ class InputContainer(tk.CTkFrame):
             if(isIterationValid()):
                 messagebox.showwarning("Iteration InValid","Please fill the Iteration Field or Re-input the valid data for the iteration")
                 return
-            if(isBlankOnData()):
-                messagebox.showwarning("Field Data Invalid","Please Fill all the Input Dots or Re-input the valid data for the data field")
-                return
-                               
-            data_length = int(self.inputField.InputLabel.cget("text"))
-            for i in range(data_length):               
-                db.set_control_points_from_idx((self.data_x[i].get(),self.data_y[i].get()))
+            # if(isBlankOnData()):
+            #     messagebox.showwarning("Field Data Invalid","Please Fill all the Input Dots or Re-input the valid data for the data field")
+            #     return
+
+            if(self.data_path):
+                count = 0
+                with open(self.data_path, "r") as f:
+                    for i in range(len(self.data_x)):
+                        data = f.readline().strip().split(',')
+                        count += 1
+                        db.set_control_points_from_idx((data[0],data[1]))
+                    f.close()
+                db.set_selected_points(count)
+                db.set_iterations(self.entry_iteration.get())
+                db.data_algorithm = algorithm
+                self.callbackFunction()
+
+            else:
+                data_length = int(self.inputField.InputLabel.cget("text"))
+                for i in range(data_length):               
+                    db.set_control_points_from_idx((self.data_x[i].get(),self.data_y[i].get()))
                 db.set_selected_points(data_length)
 
-            db.set_iterations(self.entry_iteration.get())
-            db.data_algorithm = algorithm
-            self.callbackFunction()
+                db.set_iterations(self.entry_iteration.get())
+                db.data_algorithm = algorithm
+                self.callbackFunction()
             
 
         def BruteForceCallout():
@@ -254,7 +268,11 @@ class InputFieldDots:
                     return True   
                 elif value_if_allowed == '-' or value_if_allowed[1:].isdigit():
                     return True
-                return False
+                try:
+                    float(value_if_allowed)
+                    return True
+                except ValueError:
+                    return False
             return True
 
     # Update all the data fields grid
@@ -391,12 +409,27 @@ class OutputFrame(tk.CTkFrame):
         self.canvas.scan_dragto(event.x, event.y, gain=1)
 
     def setupOutputCanvas(self):
+        def display_coordinates(event):
+            print("Click Coordinates : ")
+            print("X : ",event.x)
+            print("Y : ",event.y)
+
+            print("Width and Height : ",self.canvas.winfo_width(),self.canvas.winfo_height())
 
         scrollbar = tk.CTkScrollbar(self, orientation=tk.VERTICAL)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        def call_bezier():
+        
+            # height are applied inside the change_control_points function
+            self.canvas.change_control_points(self.canvas.winfo_height(),self.canvas.winfo_width())
+            self.canvas.setup_bezier_animation()
+            self.canvas.bezier_curve()
 
         if db.is_Button_clicked:
+            
             db.is_animated = True
+            
             control_points = db.get_selected_control_points()
             iteration = db.get_iteration()
 
@@ -405,29 +438,18 @@ class OutputFrame(tk.CTkFrame):
             min_y = min(control_points, key=lambda point: point[1])[1]
             max_y = max(control_points, key=lambda point: point[1])[1]
 
-            canvas_width = max(max_x - min_x, 0) + 200
-            canvas_height = max(max_y - min_y, 0) + 200
+            canvas_width = max(max_x - min_x, 0) + 100
+            canvas_height = max(max_y - min_y, 0) + 100
 
-            db.set_apps_height(canvas_height - 100)
-            db.set_apps_width(canvas_width - 100)
-
-            db.handle_negatives_data(max_x, max_y)
-
-            screen_height=  604
-            screen_width = 804
-
-            max_x = max(control_points, key=lambda point: point[0])[0]
-            min_x = min(control_points, key=lambda point: point[0])[0]
-            max_y = max(control_points, key=lambda point: point[1])[1]
-            min_y = min(control_points, key=lambda point: point[1])[1]
-            control_points = db.get_selected_control_points()
-
-            scale_x = screen_width / (max_x - min_x)
-            scale_y = screen_height / (max_y - min_y)
 
             algorithm = bz.algorithm_decider(db.data_algorithm)
 
-            control_points = [(x * scale_x, y * scale_y) for x, y in control_points]
+            # Setup for handling negative number 
+            db.set_apps_height(canvas_height - 100)
+            db.set_apps_width(canvas_width - 100)
+            db.max_x = max_x
+            db.max_y = max_y
+
 
             if self.canvas:
                 self.canvas.destroy()
@@ -436,30 +458,18 @@ class OutputFrame(tk.CTkFrame):
             else:
                 self.canvas = bz.BruteForce_Algorithm(self, control_points, iteration, db.animation_speed)
 
-            self.canvas.pack_configure(fill=tk.BOTH, expand=True, padx=10, pady=20, side="top")
+            self.canvas.pack_configure(padx=10, pady=20, side="top",fill='x')
             self.canvas.pack()
-            self.canvas.configure(scrollregion=(min_x, min_y, min_x + canvas_width, min_y + canvas_height))
 
-            self.canvas.xview_moveto(min_x - 100)
-            self.canvas.yview_moveto(min_y - 100)
-            self.canvas.setup_bezier_animation()
-            self.canvas.bezier_curve()
-
-            # Bind mouse wheel event for canvas scaling
-            # self.canvas.bind_all("<MouseWheel>", self.on_canvas_scale)
-
-            # self.canvas.bind("<ButtonPress-1>", self.on_canvas_drag_Start)
-            # self.canvas.bind("<B1-Motion>", self.on_canvas_drag_motion)
-
-            # Configure canvas scrolling
-            self.canvas.config(yscrollcommand=scrollbar.set)
-            scrollbar.configure(command=self.canvas.yview)
-            db.handle_scales_data()
+            self.after(100, call_bezier)
             db.is_animated = False
         else:
-            self.canvas = tk.CTkCanvas(self,height=800)
+            self.canvas = tk.CTkCanvas(self,height=1100,width = 2000)
             self.canvas.pack()
-            self.canvas.pack_configure(padx=10, pady=20, fill="both",expand=True, side="top")
+            self.canvas.pack_configure(padx=10, pady=20, side="top")
+        self.canvas.bind("<ButtonPress-1>",display_coordinates)
+        self.canvas.config(yscrollcommand=scrollbar.set)
+        scrollbar.configure(command=self.canvas.yview)
     def setupTime(self):
         self.timeLabel = tk.CTkLabel(self,text="Time Execution: ",font=self.fontTime, text_color="white")
         self.timeLabel.pack()
@@ -469,18 +479,3 @@ class OutputFrame(tk.CTkFrame):
 def main():
     app = App()
     app.mainloop()
-
-'''
-
-def main():
-    root = tk.Tk()
-    root.title("Bezier Animation")
-
-    canvas = BezierAnimation(root)
-    canvas.bezier_curve(canvas.point_curve)
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
-
-'''
