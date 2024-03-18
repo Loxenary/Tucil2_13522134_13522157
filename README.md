@@ -28,6 +28,6 @@ Once you have completed the above steps, the project setup is complete and the p
 
 <b>Special thanks to our contributors:</b>
 1. Shabrina Maharani (13522134) <br>
-   - GitHub: [LinkToGithub](https://github.com/shabrinamaharani)
+   - GitHub: [Maharanish](https://github.com/Maharanish)
 2. Muhammad Davis Adhipramana (13522157) <br>
-   - GitHub: [LinkToGithub](https://github.com/Davis-Adhipramana)
+   - GitHub: [Loxenary](https://github.com/Loxenary)
