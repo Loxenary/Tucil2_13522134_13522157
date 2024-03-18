@@ -510,9 +510,9 @@ class OutputFrame(tk.CTkFrame):
             if self.canvas:
                 self.canvas.destroy()
             if algorithm == "DNC":
-                self.canvas = bz.DNC_Algorthm(self, control_points, iteration, db.animation_speed)
+                self.canvas = bz.DNC_Algorthm(self, control_points, iteration, db.animation_speed, weight_line = 3, weight_circle=6, weight_curve=2, interpolated_weight=3)
             else:
-                self.canvas = bz.BruteForce_Algorithm(self, control_points, iteration, db.animation_speed)
+                self.canvas = bz.BruteForce_Algorithm(self, control_points, iteration, db.animation_speed,weight_line = 3, weight_circle=6, weight_curve=2, interpolated_weihgt=3)
 
             self.canvas.pack_configure(padx=10, pady=20, side="top",fill='x')
             self.canvas.pack()
