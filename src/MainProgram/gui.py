@@ -231,7 +231,7 @@ class InputFieldDots:
         self.SetupListDataField()
     # Prepate Button Images
     def ButtonPreparation(self):
-        button_image_path = os.path.join(os.path.dirname(__file__), "Assets","triangle.png")
+        button_image_path = os.path.join("../", "Assets","triangle.png")
         button_image = Image.open(button_image_path)
 
         self.left_button_image = button_image.rotate(90)
@@ -374,23 +374,6 @@ class OutputFrame(tk.CTkFrame):
 
     def setupTimeExecution(self):
         self.timeLabel.configure(text= f'Time Execution: {db.get_time_execution()}')
-
-    def on_canvas_scroll(self,event):
-    # Perform scroll operation
-        self.canvas.yview_scroll(-1 * event.delta, "units")
-    def on_canvas_scale(self,event):
-    # Perform scale operation
-        if event.delta > 0:
-            scale_factor = 1.1  # Zoom in
-        else:
-            scale_factor = 0.9  # Zoom out
-        self.canvas.scale("all", event.x, event.y, scale_factor, scale_factor)
-
-    def on_canvas_drag_Start(self,event):
-        self.canvas.scan_mark(event.x, event.y)
-    
-    def on_canvas_drag_motion(self,event):
-        self.canvas.scan_dragto(event.x, event.y, gain=1)
 
     def setupOutputCanvas(self):
         def setup_grid_coordinate():

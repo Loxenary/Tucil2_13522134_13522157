@@ -2,7 +2,6 @@
 from typing import List, Tuple, Union
 
 class Database:
-    max_control_points = 20
     control_points: List[Tuple[float, float]] = []
     iterations: int = 0
     selected_points: int = 0
