@@ -189,7 +189,7 @@ class BezierCurve:
         plt.plot(*zip(*self.curve_points), marker='o', color='blue', label='Bezier Curve')
 
         # Plot midpoints
-        plt.plot(*zip(*self.midpoints), marker='o', color='green', linestyle='None',label='midpoint')
+        #plt.plot(*zip(*self.midpoints), marker='o', color='green', linestyle='None',label='midpoint')
         
         plt.legend()
         plt.title('Bezier Curve')
