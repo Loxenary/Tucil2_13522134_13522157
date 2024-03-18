@@ -22,7 +22,6 @@ class App(tk.CTk):
         if(not db.is_animated):
             self.OutputFrame.destroy()
             self.OutputFrame = OutputFrame(self)
-            self.OutputFrame.setupTimeExecution()
 class InputFrame(tk.CTkFrame):
     def __init__(self, parent, callbackFunction):
         super().__init__(master=parent,corner_radius=0)
@@ -159,14 +158,13 @@ class InputContainer(tk.CTkFrame):
             for i in range(length_entry):
                 data_x = self.data_x[i].get()
                 data_y = self.data_y[i].get()
-                if(data_x[0] == '-' and data_x[1:].isdigit()):
-                    continue
-                if(data_y[0] == '-' and data_y[1:].isdigit()):
-                    continue
-                if(data_x == "X" or data_y == "Y" or (not data_x.isdigit()) or (not data_y.isdigit())):
+                try:
+                    float(data_x)
+                    float(data_y)
+                except ValueError:
+                    return True    
+                if(data_x == "X" or data_y == "Y"):
                     return True
-                
-                
             return False
     
         
@@ -177,7 +175,7 @@ class InputContainer(tk.CTkFrame):
                 messagebox.showwarning("Iteration InValid","Please fill the Iteration Field or Re-input the valid data for the iteration")
                 return
             if(isBlankOnData()):
-                messagebox.showwarning("Field Data Invalid","Please Fill all the Input Dots or Re-input the valid data for the data field")
+                messagebox.showwarning("Field Data Invalid","Please Fill all the Control Points or Re-input the valid data for the data field")
                 return
             
             data_length = int(self.inputField.InputLabel.cget("text"))
@@ -482,6 +480,7 @@ class OutputFrame(tk.CTkFrame):
             self.canvas.change_control_points(self.canvas.winfo_height(),self.canvas.winfo_width())
             self.canvas.setup_bezier_animation()
             self.canvas.bezier_curve()
+            self.setupTimeExecution()
 
         if db.is_Button_clicked:
             
