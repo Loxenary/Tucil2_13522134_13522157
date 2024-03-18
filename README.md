@@ -1,7 +1,7 @@
 <h1 align="center" style="font-size: 40px">Bezier Curves Divide And Conquer Animation</h1>
 <br>
 <p align="center">
-  <img src="test/test_5_bonus/dnc_bonus_5.png"
+  <img src="test/test_5_bonus/dnc_bonus_5.png" width="600" height="400"/>
 </p>
 
 ## Project Overview
@@ -12,67 +12,20 @@ Pembuatan GUI yang dapat menampilkan hasil visual dari algoritma yang dijalankan
 
 ### Requirement
 1. Clone this project by
-```
-git clone https://github.com/Loxenary/Tucil2_13522134_13522157/new/main
-```
-
-4. Download game Engine code from
-   https://github.com/haziqam/tubes1-IF2211-game-engine/releases/tag/v1.1.0
-5. Goes to root directory by
-
-```
-cd tubes1-IF2110-game-engine-1.1.1.0
-```
-
-6. Install dependencies
-
-```
-yarn
-```
-
-7. Setup default environtment variable by
-
-- For Windows
-  ```
-  ./scripts/copy-env.bat
-  ```
-- For Linux
-  ```
-  chmod +x ./scripts/copy-env.sh
-  ./scripts/copy-env.sh
-  ```
-
-8. Setup local database <br><b>⚠️ make sure to open the docker desktop first ⚠️</b>
-
-```
-docker compose up -d database
-```
-
-- For windows
-  ```
-  ./scripts/setup-db-prisma.bat
-  ```
-- For Linux or mc os
-  ```
-  chmod +x ./scripts/setup-db-prisma.sh
-  ./scripts/setup-db-prisma.sh
-  ```
-
-9. Build or Run <br><b>⚠️ make sure to open the docker desktop first ⚠️</b>
-
-- Build
-  ```
-  npm run build
-  ```
-- Run
-  ```
-  npm run start
-  ```
-
-<b>full instructions can be followed from this link below:
-https://docs.google.com/document/d/1L92Axb89yIkom0b24D350Z1QAr8rujvHof7-kXRAp7c/edit</b>
-
-### Setup Bot
+    ```
+    git clone https://github.com/Loxenary/Tucil2_13522134_13522157/new/main
+    ```
+2. Proceed to the src by
+    ```
+    cd src
+    ```
+3. Install dependecies by installing the requirements.txt (Make sure that you are inside src folder)
+    ```
+    pip install -r "requirements.txt"
+    ```
+if you have done all of that, the project setup has been done and the project can be launched.
+see the Detail here : <br>
+[Running The Project](src/README.md)
 
 1. Download the bot script in this repository
 2. Make sure to run the Game Engine
