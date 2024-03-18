@@ -170,7 +170,6 @@ class InputContainer(tk.CTkFrame):
         
         def DataSave(algorithm):
             db.clear_all_data()
-            # self.data_path = os.path.join(os.path.dirname(__file__),"data.txt")
             if(isIterationValid()):
                 messagebox.showwarning("Iteration InValid","Please fill the Iteration Field or Re-input the valid data for the iteration")
                 return
